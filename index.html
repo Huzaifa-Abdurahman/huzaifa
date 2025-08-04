@@ -471,7 +471,69 @@
     <button class="back-to-top" id="backToTop" aria-label="Back to top">
         <i class="arrow-up">↑</i>
     </button>
+<!-- Chatbot Widget -->
+    <div class="chatbot-widget">
+        <!-- Floating Button -->
+        <div class="chatbot-bubble" id="chatbotBubble">
+            <div class="notification-dot">1</div>
+            <svg class="chatbot-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12c0 1.54.36 3.04.97 4.43L1 23l6.57-1.97C9.96 21.64 11.46 22 13 22h7c1.1 0 2-.9 2-2V12c0-5.52-4.48-10-10-10zm0 18c-1.38 0-2.74-.35-3.93-.99L3 20l1.01-5.07C3.35 13.74 3 12.38 3 11c0-4.97 4.03-9 9-9s9 4.03 9 9-4.03 9-9 9z"/>
+                <circle cx="9" cy="12" r="1"/>
+                <circle cx="12" cy="12" r="1"/>
+                <circle cx="15" cy="12" r="1"/>
+            </svg>
+        </div>
 
+        <!-- Chat Window -->
+        <div class="chatbot-window" id="chatbotWindow">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="header-content">
+                    <div class="bot-avatar">🤖</div>
+                    <div class="bot-info">
+                        <h3>Huzaifa's AI Assistant</h3>
+                        <div class="bot-status">
+                            <div class="status-dot"></div>
+                            Online • Powered by Gemini AI
+                        </div>
+                    </div>
+                    <button class="close-btn" id="closeChat">×</button>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <p>👋 Hi! I'm Huzaifa's AI assistant. I can answer questions about his skills, experience, projects, and services. How can I help you today?</p>
+                </div>
+                
+                <div class="quick-actions">
+                    <div class="quick-action" data-message="Tell me about Huzaifa's skills">💻 Skills</div>
+                    <div class="quick-action" data-message="What projects has Huzaifa worked on?">🚀 Projects</div>
+                    <div class="quick-action" data-message="How can I contact Huzaifa?">📞 Contact</div>
+                    <div class="quick-action" data-message="What services does Huzaifa offer?">🛠️ Services</div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="chat-input-area">
+                <div class="input-container">
+                    <textarea 
+                        class="chat-input" 
+                        id="chatInput" 
+                        placeholder="Ask me anything about Huzaifa..."
+                        rows="1"
+                    ></textarea>
+                    <button class="send-btn" id="sendBtn">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+        </div>
+    </div>
     <section>
         <div class="footer" data-aos="fade-up">
             <div class="r1">
@@ -787,5 +849,288 @@
 
         animateCircles();
     </script>
+    
+    <script>
+        class ChatBot {
+            constructor() {
+                this.apiKey = 'AIzaSyD2BhifWFhyMGCy62qvBr3seiTP6v9u76k'; // Replace with your actual API key
+                // SETUP INSTRUCTIONS:
+                // 1. Get your free Gemini API key from: https://makersuite.google.com/app/apikey
+                // 2. Replace 'YOUR_GEMINI_API_KEY' above with your actual key
+                // 3. Customize the colors, avatar, and messages below if needed
+                this.apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+                
+                this.elements = {
+                    bubble: document.getElementById('chatbotBubble'),
+                    window: document.getElementById('chatbotWindow'),
+                    closeBtn: document.getElementById('closeChat'),
+                    messages: document.getElementById('chatMessages'),
+                    input: document.getElementById('chatInput'),
+                    sendBtn: document.getElementById('sendBtn'),
+                    errorMessage: document.getElementById('errorMessage')
+                };
+
+                this.isOpen = false;
+                this.isTyping = false;
+                
+                this.portfolioContext = `
+                You are Huzaifa Abdurahman's AI assistant. Here's information about Huzaifa:
+
+                PERSONAL INFO:
+                - Full Stack Web Developer, UI/UX Designer, and AI Expert
+                - Based in Lahore, Pakistan
+                - Passionate about creating modern, innovative web solutions
+
+                EDUCATION:
+                - Full Stack Web Development & Designing from Brains College Lahore (August 2022)
+                - Intermediate (Pre-Engineering) from Kips College Lahore (August 2024)
+                - Web 3.0, Blockchain and Generative AI Engineer from PIAIC (February 2025)
+                - BS-IT from Air University Islamabad (September 2024)
+
+                SKILLS:
+                - Web Development (75%): HTML, CSS, JavaScript, TypeScript, React, Next.js, Tailwind CSS
+                - UI/UX Design (50%): Adobe Illustrator, Photoshop, Figma
+                - Generative AI (40%): Python, Docker, OpenAI APIs
+
+                SERVICES:
+                - Web Development: Modern responsive websites using cutting-edge technologies
+                - UI/UX Design: Beautiful and intuitive user experiences
+                - Generative AI Engineering: AI solutions and automation
+
+                PROJECTS:
+                - E-Commerce Platform (punjabsoap.com) - React, Node.js, MongoDB
+                - Company Portfolio App (galaxy-software-hub.vercel.app) - Next.js, Three.js
+                - AI Management System (ai-manegment-system.vercel.app) - Python, OpenAI API
+                - Blogging Website with AI Agent (huztech.site) - WordPress, Rust, AI automation
+                - LinkGuard (link-guard-rust.vercel.app) - Next.js, FastAPI, Python
+
+                CONTACT:
+                - Email: abdurahhuzaifa393@gmail.com
+                - Phone/WhatsApp: +92 310 0043155
+                - GitHub: github.com/Huzaifa-Abdurahman
+                - LinkedIn: linkedin.com/in/huzaifa-abdurahman-159303265
+                - Instagram: @huzaifaabdurahman
+                - Facebook: Huzaifa Abdurahman
+                - Fiverr: Available for freelance work
+                - Resume: Available via Google Drive link
+
+                PERSONALITY:
+                - Professional yet friendly
+                - Innovative and detail-oriented
+                - Passionate about technology and helping clients
+                - Always learning and adapting to new technologies
+
+                Please answer questions about Huzaifa in a friendly, professional manner. Be specific about his skills and experience. If asked about something not in this context, politely redirect to topics you can help with.
+                `;
+
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.setupQuickActions();
+                this.autoResize();
+            }
+
+            bindEvents() {
+                this.elements.bubble.addEventListener('click', () => this.toggleChat());
+                this.elements.closeBtn.addEventListener('click', () => this.closeChat());
+                this.elements.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.elements.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+
+                // Auto-resize textarea
+                this.elements.input.addEventListener('input', () => this.autoResize());
+            }
+
+            setupQuickActions() {
+                const quickActions = document.querySelectorAll('.quick-action');
+                quickActions.forEach(action => {
+                    action.addEventListener('click', () => {
+                        const message = action.getAttribute('data-message');
+                        this.elements.input.value = message;
+                        this.sendMessage();
+                    });
+                });
+            }
+
+            autoResize() {
+                const textarea = this.elements.input;
+                textarea.style.height = 'auto';
+                textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+            }
+
+            toggleChat() {
+                if (this.isOpen) {
+                    this.closeChat();
+                } else {
+                    this.openChat();
+                }
+            }
+
+            openChat() {
+                this.elements.window.classList.add('show');
+                this.elements.bubble.classList.add('active');
+                this.isOpen = true;
+                
+                // Hide notification dot
+                const notificationDot = document.querySelector('.notification-dot');
+                if (notificationDot) {
+                    notificationDot.style.display = 'none';
+                }
+                
+                // Focus input
+                setTimeout(() => {
+                    this.elements.input.focus();
+                }, 300);
+            }
+
+            closeChat() {
+                this.elements.window.classList.remove('show');
+                this.elements.bubble.classList.remove('active');
+                this.isOpen = false;
+            }
+
+            async sendMessage() {
+                const message = this.elements.input.value.trim();
+                if (!message || this.isTyping) return;
+
+                // Clear error message
+                this.elements.errorMessage.textContent = '';
+
+                // Add user message
+                this.addMessage(message, 'user');
+                this.elements.input.value = '';
+                this.autoResize();
+
+                // Show typing indicator
+                this.showTypingIndicator();
+
+                try {
+                    const response = await this.callGeminiAPI(message);
+                    this.hideTypingIndicator();
+                    this.addMessage(response, 'bot');
+                } catch (error) {
+                    this.hideTypingIndicator();
+                    this.showError('Sorry, I\'m having trouble connecting right now. Please try again later.');
+                    console.error('Chat error:', error);
+                }
+            }
+
+            async callGeminiAPI(message) {
+                if (!this.apiKey || this.apiKey === 'YOUR_GEMINI_API_KEY') {
+                    throw new Error('API key not configured');
+                }
+
+                const prompt = `${this.portfolioContext}\n\nUser question: ${message}\n\nPlease provide a helpful response about Huzaifa Abdurahman:`;
+
+                const response = await fetch(`${this.apiUrl}?key=${this.apiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 1024,
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    return data.candidates[0].content.parts[0].text;
+                } else {
+                    throw new Error('Invalid API response format');
+                }
+            }
+
+            addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.textContent = content;
+                
+                messageDiv.appendChild(messageContent);
+                this.elements.messages.appendChild(messageDiv);
+                
+                // Scroll to bottom
+                this.elements.messages.scrollTop = this.elements.messages.scrollHeight;
+            }
+
+            showTypingIndicator() {
+                this.isTyping = true;
+                this.elements.sendBtn.disabled = true;
+                
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'typing-indicator';
+                typingDiv.id = 'typingIndicator';
+                
+                typingDiv.innerHTML = `
+                    <div class="typing-avatar">🤖</div>
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `;
+                
+                this.elements.messages.appendChild(typingDiv);
+                this.elements.messages.scrollTop = this.elements.messages.scrollHeight;
+            }
+
+            hideTypingIndicator() {
+                this.isTyping = false;
+                this.elements.sendBtn.disabled = false;
+                
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+
+            showError(message) {
+                this.elements.errorMessage.textContent = message;
+                this.addMessage("I apologize, but I'm experiencing technical difficulties. Please try asking your question again, or feel free to contact Huzaifa directly via email at abdurahhuzaifa393@gmail.com", 'bot');
+            }
+        }
+
+        // Initialize chatbot when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new ChatBot();
+        });
+
+        // Add some demo content to body for testing
+        document.body.innerHTML += `
+            <div style="padding: 50px; color: white; text-align: center;">
+                <h1>Portfolio Website</h1>
+                <p>This is a demo page. The chatbot is located in the bottom-right corner.</p>
+                <p>Click the floating button to start chatting!</p>
+                <br><br><br><br><br><br><br><br><br><br>
+                <p>Scroll down to see more content...</p>
+                <br><br><br><br><br><br><br><br><br><br>
+                <p>The chatbot follows you as you scroll!</p>
+            </div>
+        `;
+    </script>
+
 </body>
 </html>
