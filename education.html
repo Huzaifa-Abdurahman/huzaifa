@@ -134,14 +134,7 @@
         /* Education Cards */
         .education-section {
             margin-bottom: 80px;
-            opacity: 0;
-            transform: translateY(30px);
             transition: all 0.6s ease;
-        }
-
-        .education-section.active {
-            opacity: 1;
-            transform: translateY(0);
         }
 
         .education-card {
@@ -559,7 +552,7 @@
         </div>
 
         <!-- Web Development Course -->
-        <section id="web-dev" class="education-section active" data-aos="fade-up" data-aos-delay="100">
+        <section id="web-dev" class="education-section" data-aos="fade-up" data-aos-delay="100">
             <div class="education-card">
                 <div class="card-header">
                     <div class="card-title">
@@ -819,13 +812,14 @@
             const targetElement = document.querySelector(hash);
 
             if (targetElement) {
-                // Remove active class from all sections
-                document.querySelectorAll('.education-section').forEach(section => {
-                    section.classList.remove('active');
-                });
+                // Remove active class from all nav dots
+                document.querySelectorAll('.nav-dot').forEach(dot => dot.classList.remove('active'));
                 
-                // Add active class to target section
-                targetElement.classList.add('active');
+                // Add active class to the corresponding dot
+                const targetDot = document.querySelector(`.nav-dot[data-target="${targetElement.id}"]`);
+                if (targetDot) {
+                    targetDot.classList.add('active');
+                }
                 
                 // Scroll to the section with an offset for the fixed navigation
                 const navHeight = document.querySelector('.nav').offsetHeight;
