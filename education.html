@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="shortcut icon" type="image/png" href="/h-logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Education Details - Huzaifa Abdurahman</title>
     <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        *, 
+        *,
         *::after,
         *::before {
             box-sizing: border-box;
@@ -580,7 +579,7 @@
                             <li>Modern JavaScript ES6+ features and best practices</li>
                             <li>Responsive web design using CSS3 and Flexbox/Grid</li>
                             <li>React.js for building dynamic user interfaces</li>
-                            <li>Node.js and Next.js.js for server-side development</li>
+                            <li>Node.js and Next.js for server-side development</li>
                             <li>Database design and management with MongoDB</li>
                             <li>Fast API development and integration</li>
                             <li>Version control with Git and GitHub</li>
@@ -806,7 +805,7 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Initialize AOS
+        // Initialize AOS library for scroll animations
         AOS.init({
             duration: 1000,
             easing: 'ease-in-out',
@@ -814,20 +813,107 @@
             mirror: false
         });
 
-        // Get URL hash and scroll to specific section
+        // Function to scroll to a specific section, handling the fixed navigation bar offset
         function scrollToSection() {
             const hash = window.location.hash;
-            if (hash) {
-                const targetElement = document.querySelector(hash);
+            const targetElement = document.querySelector(hash);
+
+            if (targetElement) {
+                // Remove active class from all sections
+                document.querySelectorAll('.education-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Add active class to target section
+                targetElement.classList.add('active');
+                
+                // Scroll to the section with an offset for the fixed navigation
+                const navHeight = document.querySelector('.nav').offsetHeight;
+                const offsetTop = targetElement.offsetTop - navHeight - 30; // 30px for extra padding
+                
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Call scrollToSection on page load and whenever the hash changes
+        window.addEventListener('DOMContentLoaded', scrollToSection);
+        window.addEventListener('hashchange', scrollToSection);
+
+        // --- Navigation Dots Logic ---
+        const sections = document.querySelectorAll('.education-section');
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        // Function to update the active navigation dot based on the current scroll position
+        function updateNavDots() {
+            let currentActiveSectionId = '';
+            const scrollY = window.scrollY;
+            const navHeight = document.querySelector('.nav').offsetHeight;
+            const scrollThreshold = scrollY + navHeight + 50; // Add an offset
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+
+                if (scrollThreshold >= sectionTop && scrollThreshold < sectionTop + sectionHeight) {
+                    currentActiveSectionId = section.id;
+                }
+            });
+
+            navDots.forEach(dot => {
+                dot.classList.remove('active');
+                if (dot.getAttribute('data-target') === currentActiveSectionId) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        // Add event listeners for scrolling and clicking navigation dots
+        window.addEventListener('scroll', updateNavDots);
+        navDots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const targetId = dot.getAttribute('data-target');
+                const targetElement = document.getElementById(targetId);
                 if (targetElement) {
-                    // Remove active class from all sections
-                    document.querySelectorAll('.education-section').forEach(section => {
-                        section.classList.remove('active');
+                    const navHeight = document.querySelector('.nav').offsetHeight;
+                    const offsetTop = targetElement.offsetTop - navHeight - 30;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
                     });
-                    
-                    // Add active class to target section
-                    targetElement.classList.add('active');
-                    
-                    // Scroll to the section with offset for fixed nav
-                    setTimeout(() => {
-                        const offsetTop = targetElement.offsetTop
+                }
+            });
+        });
+
+        // --- Back to Top Button Logic ---
+        const backToTopButton = document.getElementById('backToTop');
+        const scrollVisibilityThreshold = 300;
+
+        // Function to show/hide the button based on scroll position
+        function toggleBackToTopButton() {
+            if (window.scrollY > scrollVisibilityThreshold) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        }
+
+        // Event listener to toggle the button visibility on scroll
+        window.addEventListener('scroll', toggleBackToTopButton);
+
+        // Event listener to scroll to the top when the button is clicked
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Initial call to set the correct active dot on load
+        updateNavDots();
+
+    </script>
+</body>
+</html>
